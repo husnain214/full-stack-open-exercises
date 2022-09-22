@@ -31,12 +31,14 @@ const StatisticsTable = ({good, neutral, bad}) => {
   
   return (
     <table>
-      <tr><StatisticLine text = "good" value = {good} percent = "" /></tr>
-      <tr><StatisticLine text = "neutral" value = {neutral} percent = "" /></tr>
-      <tr><StatisticLine text = "bad" value = {bad} percent = "" /></tr>
-      <tr><StatisticLine text = "all" value = {all} percent = "" /></tr>
-      <tr><StatisticLine text = "average" value = {average} percent = "" /></tr>
-      <tr><StatisticLine text = "positive" value = {positive} percent = "%" /></tr>
+      <tbody>
+        <tr><StatisticLine text = "good" value = {good} percent = "" /></tr>
+        <tr><StatisticLine text = "neutral" value = {neutral} percent = "" /></tr>
+        <tr><StatisticLine text = "bad" value = {bad} percent = "" /></tr>
+        <tr><StatisticLine text = "all" value = {all} percent = "" /></tr>
+        <tr><StatisticLine text = "average" value = {average} percent = "" /></tr>
+        <tr><StatisticLine text = "positive" value = {positive} percent = "%" /></tr>
+      </tbody>
     </table>
   )
 }
