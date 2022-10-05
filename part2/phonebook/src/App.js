@@ -1,35 +1,37 @@
 import { useState } from 'react'
 
+import Filter from "./components/Filter"
+import PersonForm from "./components/PersonForm"
+import Persons from "./components/Persons"
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
-  const [newName, setNewName] = useState('')
+  const [searchName, setSearchName] = useState('')
 
-  const handleInput = event => setNewName(event.target.value)
-
-  const handleSubmit = event => {
-    event.preventDefault()
-
-    setPersons(persons.concat({name: newName}))
-  }
+  const handleSearchInput = event => setSearchName(event.target.value)
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          name: <input onChange = {handleInput} value = {newName} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      
-      <div>
-        {
-          persons.map(person => <p key = {persons.name}>{person.name}</p>) ?? "..."
-        }
-      </div>
+
+      <Filter 
+        onChange = {handleSearchInput} 
+        searchName = {searchName} 
+      />
+
+      <h3>add new</h3>
+
+      <PersonForm 
+        persons = {persons}
+        setPersons = {setPersons}
+      />
+
+      <h3>Numbers</h3>
+
+      <Persons 
+        persons = {persons} 
+        searchName = {searchName}  
+      />
     </div>
   )
 }
