@@ -4,6 +4,7 @@ import axios from 'axios'
 const App = () => {
   const [countries, setCountries] = useState([]) 
   const [searchCountry, setSearchCountry] = useState('')
+  const [countryDetails, setCountryDetails] = useState('')
 
   useEffect(() => {
     console.log('effect')
@@ -12,7 +13,7 @@ const App = () => {
       .then(response => {
         console.log('promise fulfilled')
         setCountries(response.data)
-      })
+      })   
   }, [])
 
   console.log('render', countries.length, 'persons')
@@ -23,10 +24,20 @@ const App = () => {
     return (
       <div key = {result.name.common}>
         {result.name.common} 
-        <button value = {result.name.common}>show</button>
+        <button 
+          value = {result.name.common}
+          onClick = {showCountry}
+        >show</button>
       </div>
     )
   })
+
+  const showCountry = event => {
+    const selectedCountry = countries.filter(country => country.name.common === event.target.value)[0]
+
+
+    setCountryDetails(printCountryDetails(selectedCountry))  
+  }
 
   const printCountryDetails = country => {
     return (
@@ -66,6 +77,8 @@ const App = () => {
       <input type = "text" onChange = {handleSearchInput}></input>
 
       <div>{findSearchedCountries()}</div>
+      
+      <div>{countryDetails}</div>
     </div>
   )
 }
