@@ -19,7 +19,14 @@ const App = () => {
 
   const handleSearchInput = event => setSearchCountry(event.target.value)
 
-  const printCountriesList = results => results.map(result => <p key = {result.name.common}>{result.name.common}</p>)
+  const printCountriesList = results => results.map(result => {
+    return (
+      <div key = {result.name.common}>
+        {result.name.common} 
+        <button value = {result.name.common}>show</button>
+      </div>
+    )
+  })
 
   const printCountryDetails = country => {
     return (
@@ -33,19 +40,17 @@ const App = () => {
 
       <ul>
         {
-          Object
-            .values(country.languages)
-            .map(language => <li key = {language}>{language}</li>)
+          Object.values(country.languages).map(language => <li key = {language}>{language}</li>)
         }
       </ul>
 
-      <img src = {country.flags.png} />
+      <img src = {country.flags.png} alt = "flag" />
     </div>
     )
   }
 
   const findSearchedCountries = () => {
-    const searchResults = countries.filter(country => country.name.common.includes(searchCountry))
+    const searchResults = countries.filter(country => country.name.common.toLowerCase().includes(searchCountry))
 
     if (searchResults.length > 10) return "Too many matches, specify another filter" 
 
@@ -60,11 +65,7 @@ const App = () => {
       <label>find countries</label>
       <input type = "text" onChange = {handleSearchInput}></input>
 
-      <div>
-        {
-          findSearchedCountries()
-        }
-      </div>
+      <div>{findSearchedCountries()}</div>
     </div>
   )
 }
