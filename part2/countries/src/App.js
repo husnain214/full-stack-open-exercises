@@ -19,14 +19,40 @@ const App = () => {
 
   const handleSearchInput = event => setSearchCountry(event.target.value)
 
+  const printCountriesList = results => results.map(result => <p key = {result.name.common}>{result.name.common}</p>)
+
+  const printCountryDetails = country => {
+    return (
+      <div>
+      <h1>{country.name.common}</h1>
+
+      <p>capital {country.capital}</p>
+      <p>area {country.area}</p>
+
+      <h2>languages</h2>
+
+      <ul>
+        {
+          Object
+            .values(country.languages)
+            .map(language => <li key = {language}>{language}</li>)
+        }
+      </ul>
+
+      <img src = {country.flags.png} />
+    </div>
+    )
+  }
+
   const findSearchedCountries = () => {
-    let searchResults = countries
-                          .filter(country => country.name.common.includes(searchCountry))
-                          .map(country => <p key = {country.name.common}>{country.name.common}</p>)
+    const searchResults = countries.filter(country => country.name.common.includes(searchCountry))
 
-    if (searchResults.length > 10) return "Too many matches, specify another filter"
+    if (searchResults.length > 10) return "Too many matches, specify another filter" 
 
-    if (searchResults.length === 1) console.log (searchResults[0])
+    if (searchResults.length === 1) return printCountryDetails (searchResults[0])
+
+    if (searchResults.length < 10 && searchResults.length > 1) 
+      return printCountriesList (searchResults)
   } 
 
   return (
