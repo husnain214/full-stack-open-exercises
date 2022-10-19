@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import Input from "./Input"
+import PhoneService from '../services/PhoneService'
 
 const PersonForm = ({persons, setPersons}) => {
     const [newName, setNewName] = useState('')
@@ -12,10 +13,19 @@ const PersonForm = ({persons, setPersons}) => {
     const handleSubmit = event => {
         event.preventDefault()
 
-        if (persons.find(person => person.name === newName) === undefined) 
+        const existingEntry = persons.filter(person => person.name === newName)
+
+        if (!existingEntry.length) {
+            PhoneService.create({name: newName, number: newNumber})
             setPersons(persons.concat({name: newName, number: newNumber}))
-        else  
-            alert(`${newName} is already in the phonebook`)
+        }            
+        else {
+            if(!window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) return
+
+            PhoneService
+            .update(existingEntry[0].id, {...existingEntry[0], number: newNumber})
+            .then(response => PhoneService.getAll().then(persons => setPersons(persons)))
+        }
     }
 
     return (
