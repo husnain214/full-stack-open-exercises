@@ -1,9 +1,9 @@
 import { useState } from 'react'
-
+import Notification from './Notification'
 import Input from "./Input"
 import PhoneService from '../services/PhoneService'
 
-const PersonForm = ({persons, setPersons}) => {
+const PersonForm = ({persons, setPersons, setNotification}) => {
     const [newName, setNewName] = useState('')
     const [newNumber, setNewNumber] = useState('')
 
@@ -17,6 +17,16 @@ const PersonForm = ({persons, setPersons}) => {
 
         if (!existingEntry.length) {
             PhoneService.create({name: newName, number: newNumber})
+
+            setNotification(
+                <Notification 
+                    message = {`Added ${newName}`}
+                    status = {true}
+                />
+            )
+
+            setTimeout(() => setNotification(''), 5000)
+
             setPersons(persons.concat({name: newName, number: newNumber}))
         }            
         else {
@@ -24,7 +34,21 @@ const PersonForm = ({persons, setPersons}) => {
 
             PhoneService
             .update(existingEntry[0].id, {...existingEntry[0], number: newNumber})
-            .then(response => PhoneService.getAll().then(persons => setPersons(persons)))
+            .then(response => PhoneService.getAll()
+            .then(persons => setPersons(persons)
+            .catch(error => {
+                setNotification(
+                    <Notification 
+                        message = {`Information of ${newName} has already been removed from the phonebook`}
+                        status = {false}
+                    />
+                )
+    
+                setTimeout(() => setNotification(''), 5000)
+
+                console.log(`Error: ${error}`)
+            })
+            ))
         }
     }
 

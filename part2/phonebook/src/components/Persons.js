@@ -12,7 +12,7 @@ const Persons = ({persons, searchName, setPersons, setNotification}) => {
 
             setNotification(
                 <Notification 
-                    message = {`Could not remove ${newName} from the phonebook`}
+                    message = {`Could not remove ${event.target.dataset.name} from the phonebook`}
                     status = {false}
                 />
             )
@@ -36,9 +36,9 @@ const Persons = ({persons, searchName, setPersons, setNotification}) => {
                             >Delete</button>
                           </div>
             ) : "..."
-        else 
-            phonebookList = persons.filter(person => person.name === searchName)
-                                    .map(person => <p key = {person.name}>{person.name} {person.number}</p>)
+        else phonebookList = persons
+                            .filter(person => person.name === searchName)
+                            .map(person => <p key = {person.name}>{person.name} {person.number}</p>)
 
         return phonebookList
     }
