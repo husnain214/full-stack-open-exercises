@@ -1,12 +1,24 @@
 import PhoneService from "../services/PhoneService"
+import Notification from "./Notification"
 
-const Persons = ({persons, searchName, setPersons}) => {
+const Persons = ({persons, searchName, setPersons, setNotification}) => {
     const handleDeleteBtn = event => {
         if(!window.confirm(`Delete ${event.target.dataset.name}?`)) return
 
         PhoneService.remove(Number(event.target.dataset.id))
         .then(response => PhoneService.getAll().then(persons => setPersons(persons)))
-        .catch(error => console.error(`Error: ${error.message}`))
+        .catch(error => {
+            console.error(`Error: ${error.message}`)
+
+            setNotification(
+                <Notification 
+                    message = {`Could not remove ${newName} from the phonebook`}
+                    status = {false}
+                />
+            )
+
+            setTimeout(() => setNotification(''), 5000)
+        })
     }
 
     const printPersonsList = () => {
