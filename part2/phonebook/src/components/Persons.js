@@ -5,7 +5,7 @@ const Persons = ({persons, searchName, setPersons, setNotification}) => {
     const handleDeleteBtn = event => {
         if(!window.confirm(`Delete ${event.target.dataset.name}?`)) return
 
-        PhoneService.remove(Number(event.target.dataset.id))
+        PhoneService.remove(event.target.dataset.id)
         .then(response => PhoneService.getAll().then(persons => setPersons(persons)))
         .catch(error => {
             console.error(`Error: ${error.message}`)
@@ -23,7 +23,7 @@ const Persons = ({persons, searchName, setPersons, setNotification}) => {
 
     const printPersonsList = () => {
         let phonebookList = ""
-
+        
         if (!searchName) 
             phonebookList = 
             (persons.length) ? persons.map(
