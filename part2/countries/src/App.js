@@ -19,7 +19,7 @@ const App = () => {
       })   
   }, [])
 
-  console.log('render', countries.length, 'persons')
+  console.log('render', countries.length, 'countries')
 
   const handleSearchInput = event => setSearchCountry(event.target.value)
 
