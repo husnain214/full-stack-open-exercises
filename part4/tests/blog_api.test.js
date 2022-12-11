@@ -6,13 +6,11 @@ const api = supertest(app)
 
 const initialBlogs = [
   {
-    id: '5a422a851b54a676234d17f7',
     title: 'React patterns',
     author: 'Michael Chan',
     url: 'https://reactpatterns.com/'
   },
   {
-    id: '5a422aa71b54a676234d17f8',
     title: 'Go To Statement Considered Harmful',
     author: 'Edsger W. Dijkstra',
     url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
@@ -22,20 +20,8 @@ const initialBlogs = [
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  console.log('cleared')
-
-  const promiseArray = initialBlogs
-    .map( blog => {
-      if(!Object.prototype.hasOwnProperty.call(blog, 'likes')) 
-        blog['likes'] = 0
-
-      return new Blog(blog)
-    } )
-    .map( blog => blog.save() )
-
-  await Promise.all(promiseArray)
-
-  console.log('done')
+  initialBlogs.forEach(blog => blog['likes'] = blog.likes ? blog.likes : 0)
+  await Blog.insertMany(initialBlogs)
 }, 10000)
 
 describe('tests for when there is some data stored in database', () => {
@@ -55,6 +41,8 @@ describe('tests for when there is some data stored in database', () => {
     const receivedBlogs = await Blog.find({})
   
     const result = receivedBlogs.every(blog => blog.likes >= 0)
+
+    console.log(receivedBlogs)
     
     expect(result).toBe(true)
   })
@@ -89,4 +77,25 @@ describe('testing all REST API requests', () => {
   })
 
   test('testing DELETE request', async () => {
-    await api
+    let allBlogs = await Blog.find({})
+    const id = allBlogs[0]._id.toHexString()
+
+    await api.delete(`/api/blogs/${id}`).expect(204)
+
+    allBlogs = await Blog.find({})
+
+    expect(allBlogs).toHaveLength(initialBlogs.length - 1)
+  })
+
+  test('testing PUT request', async () => {
+    let allBlogs = await Blog.find({})
+    const id = allBlogs[0]._id.toHexString()
+
+    await api.put(`/api/blogs/${id}`).expect(200)
+  })
+})
+  
+afterAll(() => {
+  mongoose.connection.close()
+})
+  
