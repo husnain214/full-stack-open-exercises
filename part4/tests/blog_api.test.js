@@ -22,7 +22,7 @@ beforeEach(async () => {
   await Blog.deleteMany({})
   initialBlogs.forEach(blog => blog['likes'] = blog.likes ? blog.likes : 0)
   await Blog.insertMany(initialBlogs)
-}, 10000)
+})
 
 describe('tests for when there is some data stored in database', () => {
   test('number of blogs is correct', async () => {
@@ -94,7 +94,7 @@ describe('testing all REST API requests', () => {
     await api.put(`/api/blogs/${id}`).expect(200)
   })
 })
-  
+
 afterAll(() => {
   mongoose.connection.close()
 })
