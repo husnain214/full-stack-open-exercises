@@ -1,10 +1,10 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const bcrypt = require('bcryptjs')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const app = require('../app')
 const api = supertest(app)
-
-const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjYzYTgyZmEzN2QxN2E2YzAzMTFiN2NhMSIsImlhdCI6MTY3MjE1MTE4MH0.JVqPHb8TYOaTfPgJKmaCWlkthvTdhMHfB6c1Ty1rHdE'
 
 const initialBlogs = [
   {
@@ -20,11 +20,33 @@ const initialBlogs = [
   }
 ]
 
+let token = ''
+
 beforeEach(async () => {
+  await User.deleteMany({})
+  
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'root', passwordHash })
+
+  const savedUser = await user.save()
+
+  const loggedUser = await api
+    .post('/api/login')
+    .send({
+      username: 'root', password: 'sekret'
+    })
+
+  token = 'Bearer ' + JSON.parse(loggedUser.text).token
+
   await Blog.deleteMany({})
-  initialBlogs.forEach(blog => blog['likes'] = blog.likes ? blog.likes : 0)
+
+  initialBlogs.forEach(blog => {
+    blog['likes'] = blog.likes ? blog.likes : 0
+    blog['user'] = savedUser._id.toHexString()
+  })
+
   await Blog.insertMany(initialBlogs)
-})
+}, 20000)
 
 describe('tests for when there is some data stored in database', () => {
   test('number of blogs is correct', async () => {
@@ -43,26 +65,26 @@ describe('tests for when there is some data stored in database', () => {
     const receivedBlogs = await Blog.find({})
   
     const result = receivedBlogs.every(blog => blog.likes >= 0)
-
-    console.log(receivedBlogs)
     
     expect(result).toBe(true)
   })
   
   test('title or url are not missing from request data', async () => {
     const newBlog = {
-      id: '5a422b3a1b54a676234d17f9',
       title: 'Canonical string reduction',
       author: 'Edsger W. Dijkstra',
       likes: 12
     }
   
-    await api.post('/api/blogs').set('Authorization', token).send(newBlog).expect(400)
+    await api.post('/api/blogs')
+      .set('Authorization', token)
+      .send(newBlog)
+      .expect(400)
   })
 })
 
 describe('testing all REST API requests', () => {
-  test('testing POST request', async () => {
+  test('testing POST request', async () => {  
     const newBlog = {
       title: 'Canonical string reduction',
       author: 'Edsger W. Dijkstra',
@@ -70,7 +92,10 @@ describe('testing all REST API requests', () => {
       likes: 12
     }
   
-    await api.post('/api/blogs').set('Authorization', token).send(newBlog).expect(201)
+    await api.post('/api/blogs')
+      .set('Authorization', token)
+      .send(newBlog)
+      .expect(201)
   
     const allBlogs = await Blog.find({})
   
@@ -81,7 +106,9 @@ describe('testing all REST API requests', () => {
     let allBlogs = await Blog.find({})
     const id = allBlogs[0]._id.toHexString()
 
-    await api.delete(`/api/blogs/${id}`).set('Authorization', token).expect(204)
+    await api.delete(`/api/blogs/${id}`)
+      .set('Authorization', token)
+      .expect(204)
 
     allBlogs = await Blog.find({})
 
@@ -92,7 +119,9 @@ describe('testing all REST API requests', () => {
     let allBlogs = await Blog.find({})
     const id = allBlogs[0]._id.toHexString()
 
-    await api.put(`/api/blogs/${id}`).set('Authorization', token).expect(200)
+    await api.put(`/api/blogs/${id}`)
+      .set('Authorization', token)
+      .expect(200)
   })
 })
 
