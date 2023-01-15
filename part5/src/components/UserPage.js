@@ -3,13 +3,14 @@ import { useState, useEffect } from "react"
 import blogService from "../services/blogService"
 import Notification from "./Notification"
 import Blog from "./Blog"
+import BlogForm from "./BlogForm"
 
 const UserPage = ({ setUser, username }) => {
     const [blogs, setBlogs] = useState([])
-    const [title, setTitle] = useState('')
-    const [author, setAuthor] = useState('')
-    const [url, setUrl] = useState('')
     const [message, setMessage] = useState('')
+    const [formVisible, setFormVisible] = useState(false)
+
+    const hideWhenVisible = { display: formVisible ? 'none' : '' }
 
     useEffect(() => {
         blogService
@@ -25,21 +26,6 @@ const UserPage = ({ setUser, username }) => {
         setUser(null)
     }
 
-    const createBlog = async event => {
-        event.preventDefault()
-
-        const newBlog = { title, author, url }
-
-        await blogService.create(newBlog)
-        setBlogs(blogs.concat(newBlog))
-
-        setMessage(`a new blog ${title} by ${author} has been added`)
-
-        setTimeout(() => {
-            setMessage('')
-        }, 3000)
-    }
-
     return (
       (
         <div>
@@ -51,40 +37,22 @@ const UserPage = ({ setUser, username }) => {
     
           <button onClick={ handleLogout }>logout</button>
 
-          <form onSubmit={ createBlog }>
-            <div>
-              <label htmlFor='title'>title:</label>
-              <input 
-                type='text' 
-                name='title'
-                onChange={ ({ target }) => setTitle(target.value) } 
-              />
-            </div>
+          <div style={ hideWhenVisible }>
+            <button onClick={ () => setFormVisible(true) }>new Note</button>
+          </div>
 
-            <div>
-              <label htmlFor='author'>author:</label>
-              <input 
-                type='text' 
-                name='author' 
-                onChange={ ({ target }) => setAuthor(target.value) } 
-              />
-            </div>
-            <div>
-              <label htmlFor='url'>url:</label>
-              <input 
-                type='text' 
-                name='url' 
-                onChange={ ({ target }) => setUrl(target.value) } 
-              />
-            </div>
-
-            <button type='submit'>create</button>
-          </form>
+          <BlogForm 
+            formVisible={formVisible} 
+            setFormVisible={setFormVisible} 
+            setBlogs={setBlogs} 
+            setMessage={setMessage} 
+            blogs={blogs}
+          /> 
     
           {blogs.length === 0 
             ? '...' 
             : blogs.map(blog => 
-                <Blog key={blog.id} blog={blog} />
+                <Blog key={blog.id} blog={blog} blogs={blogs} setBlogs={setBlogs} />
               )
           }
         </div>
