@@ -3,7 +3,6 @@ import blogService from '../services/blogService'
 
 const Blog = ({ blog, blogs, setBlogs }) => {
   const [detailsVisible, setDetailsVisible] = useState(false)
-  const [likes, setLikes] = useState(blog.likes)
 
   const showWhenVisible = { display: detailsVisible ? '' : 'none' }
   const hideWhenVisible = { display: detailsVisible ? 'none' : '' }
@@ -17,15 +16,22 @@ const Blog = ({ blog, blogs, setBlogs }) => {
   }
 
   const incrementLike = async () => {
-    const newBlog = {
-      ...blog,
-      likes: likes + 1
-    }
+    blog = { ...blog, likes: blog.likes + 1 }
 
-    await blogService.update(blog.id, newBlog)
- 
-    setLikes(likes + 1)
-    setBlogs(blogs.sort((first, second) => second.likes - first.likes))
+    await blogService.update(blog.id, blog)
+
+    const blogList = await blogService.getAll()
+
+    setBlogs(blogList)
+  }
+
+  const deleteBlog = async event => {
+    const deleteConfirm = window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
+    if(!deleteConfirm) return
+
+    await blogService.remove(blog.id)
+    const blogList = await blogService.getAll()
+    setBlogs(blogList)
   }
 
   return (
@@ -35,25 +41,18 @@ const Blog = ({ blog, blogs, setBlogs }) => {
       <div style={ showWhenVisible }>
         {blog.url} <br />
 
-        likes {likes} 
+        likes {blog.likes}
         <button type='button' onClick={incrementLike}>like</button>
         <br />
 
         {blog.author} <br />
       </div>
 
-      <button 
-        type='button' 
-        onClick={ () => setDetailsVisible(true) }
-        style={ hideWhenVisible }
-        >view</button>
-      <button 
-        type='button' 
-        onClick={ () => setDetailsVisible(false) }
-        style={ showWhenVisible }
-      >hide</button>
-    </div> 
-  ) 
+      <button onClick={ () => setDetailsVisible(true) } style={ hideWhenVisible }>view</button>
+      <button onClick={ () => setDetailsVisible(false) } style={ showWhenVisible }>hide</button>
+      <button onClick={ deleteBlog } style={ showWhenVisible }>remove</button>
+    </div>
+  )
 }
 
 export default Blog
