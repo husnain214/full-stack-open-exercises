@@ -27,6 +27,27 @@ const UserPage = ({ setUser, username }) => {
     setUser(null)
   }
 
+  const createBlog = async event => {
+    event.preventDefault()
+
+    const formData = new FormData(event.target)
+
+    const newBlog = {
+      title: formData.get('title'),
+      author: formData.get('author'),
+      url: formData.get('url')
+    }
+
+    await blogService.create(newBlog)
+    setBlogs(blogs.concat(newBlog))
+
+    setMessage(`a new blog ${newBlog.title} by ${newBlog.author} has been added`)
+
+    setTimeout(() => setMessage(''), 3000)
+
+    setFormVisible(false)
+  }
+
   return (
     (
       <div>
@@ -45,9 +66,7 @@ const UserPage = ({ setUser, username }) => {
         <BlogForm
           formVisible={formVisible}
           setFormVisible={setFormVisible}
-          setBlogs={setBlogs}
-          setMessage={setMessage}
-          blogs={blogs}
+          createBlog = {createBlog}
         />
 
         {blogs.length === 0
@@ -69,10 +88,9 @@ const UserPage = ({ setUser, username }) => {
 }
 
 BlogForm.propTypes = {
+  formVisible: PropTypes.bool.isRequired,
   setFormVisible: PropTypes.func.isRequired,
-  setBlogs: PropTypes.func.isRequired,
-  setMessage: PropTypes.func.isRequired,
-  blogs: PropTypes.array.isRequired
+  createBlog: PropTypes.func.isRequired,
 }
 
 export default UserPage

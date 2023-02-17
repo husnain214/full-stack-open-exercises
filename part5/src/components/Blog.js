@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import blogService from '../services/blogService'
 
-const Blog = ({ blog, blogs, setBlogs }) => {
+const Blog = ({ blog, setBlogs }) => {
   const [detailsVisible, setDetailsVisible] = useState(false)
 
   const showWhenVisible = { display: detailsVisible ? '' : 'none' }
@@ -19,13 +19,12 @@ const Blog = ({ blog, blogs, setBlogs }) => {
     blog = { ...blog, likes: blog.likes + 1 }
 
     await blogService.update(blog.id, blog)
-
     const blogList = await blogService.getAll()
 
     setBlogs(blogList)
   }
 
-  const deleteBlog = async event => {
+  const deleteBlog = async () => {
     const deleteConfirm = window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
     if(!deleteConfirm) return
 
@@ -35,10 +34,10 @@ const Blog = ({ blog, blogs, setBlogs }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       {blog.title} {blog.author}
 
-      <div style={ showWhenVisible }>
+      <div style={ showWhenVisible } className='blog-details'>
         {blog.url} <br />
 
         likes {blog.likes}
@@ -48,8 +47,16 @@ const Blog = ({ blog, blogs, setBlogs }) => {
         {blog.author} <br />
       </div>
 
-      <button onClick={ () => setDetailsVisible(true) } style={ hideWhenVisible }>view</button>
-      <button onClick={ () => setDetailsVisible(false) } style={ showWhenVisible }>hide</button>
+      <button
+        onClick={ () => setDetailsVisible(true) }
+        style={ hideWhenVisible }
+        className='show-btn'
+      >view</button>
+      <button
+        onClick={ () => setDetailsVisible(false) }
+        style={ showWhenVisible }
+        className='hide-btn'
+      >hide</button>
       <button onClick={ deleteBlog } style={ showWhenVisible }>remove</button>
     </div>
   )

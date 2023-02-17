@@ -1,27 +1,11 @@
 import { useState } from 'react'
-import blogService from '../services/blogService'
 
-const BlogForm = ({ formVisible, setFormVisible, setBlogs, setMessage, blogs }) => {
+const BlogForm = ({ formVisible, setFormVisible, createBlog }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
   const showWhenVisible = { display: formVisible ? '' : 'none' }
-
-  const createBlog = async event => {
-    event.preventDefault()
-
-    const newBlog = { title, author, url }
-
-    await blogService.create(newBlog)
-    setBlogs(blogs.concat(newBlog))
-
-    setMessage(`a new blog ${title} by ${author} has been added`)
-
-    setTimeout(() => setMessage(''), 3000)
-
-    setFormVisible(false)
-  }
 
   return (
     <form onSubmit={ createBlog } style={ showWhenVisible }>
