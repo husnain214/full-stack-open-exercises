@@ -7,13 +7,20 @@ const BlogForm = ({ formVisible, setFormVisible, createBlog }) => {
 
   const showWhenVisible = { display: formVisible ? '' : 'none' }
 
+  const addBlog = async event => {
+    event.preventDefault()
+
+    await createBlog({ title, author, url })
+  }
+
   return (
-    <form onSubmit={ createBlog } style={ showWhenVisible }>
+    <form onSubmit={ addBlog } style={ showWhenVisible }>
       <div>
         <label htmlFor='title'>title:</label>
         <input
           type='text'
           name='title'
+          id='title'
           value={ title }
           onChange={ ({ target }) => setTitle(target.value) }
         />
@@ -24,6 +31,7 @@ const BlogForm = ({ formVisible, setFormVisible, createBlog }) => {
         <input
           type='text'
           name='author'
+          id='author'
           value={ author }
           onChange={ ({ target }) => setAuthor(target.value) }
         />
@@ -33,12 +41,13 @@ const BlogForm = ({ formVisible, setFormVisible, createBlog }) => {
         <input
           type='text'
           name='url'
+          id='url'
           value={ url }
           onChange={ ({ target }) => setUrl(target.value) }
         />
       </div>
 
-      <button type='submit'>create</button>
+      <button type='submit' id='createNoteBtn'>create</button>
       <button type='button' onClick={ () => setFormVisible(false) }>cancel</button>
     </form>
   )

@@ -27,24 +27,12 @@ const UserPage = ({ setUser, username }) => {
     setUser(null)
   }
 
-  const createBlog = async event => {
-    event.preventDefault()
-
-    const formData = new FormData(event.target)
-
-    const newBlog = {
-      title: formData.get('title'),
-      author: formData.get('author'),
-      url: formData.get('url')
-    }
-
+  const createBlog = async newBlog => {
     await blogService.create(newBlog)
     setBlogs(blogs.concat(newBlog))
 
     setMessage(`a new blog ${newBlog.title} by ${newBlog.author} has been added`)
-
     setTimeout(() => setMessage(''), 3000)
-
     setFormVisible(false)
   }
 
@@ -66,7 +54,7 @@ const UserPage = ({ setUser, username }) => {
         <BlogForm
           formVisible={formVisible}
           setFormVisible={setFormVisible}
-          createBlog = {createBlog}
+          createBlog={createBlog}
         />
 
         {blogs.length === 0

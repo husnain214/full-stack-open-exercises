@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import BlogForm from './BlogForm'
 
-test('<NoteForm /> updates parent state and calls onSubmit', async () => {
+test('<BlogForm /> calls onSubmit', async () => {
   const user = userEvent.setup()
 
   const setFormVisible = jest.fn()
@@ -23,13 +23,11 @@ test('<NoteForm /> updates parent state and calls onSubmit', async () => {
   const authorInput = container.querySelector('input[name="author"]')
   const sendButton = screen.getByText('create')
 
-  screen.debug(sendButton)
-
   await user.type(titleInput, 'testing a form...')
   await user.type(urlInput, 'testing a form...')
   await user.type(authorInput, 'testing a form...')
   await user.click(sendButton)
 
   expect(createBlog.mock.calls).toHaveLength(1)
-  expect(createBlog.mock.calls[0][0].content).toBe('testing a form...')
+  expect(createBlog.mock.calls[0][0].title).toBe('testing a form...')
 })

@@ -33,14 +33,5 @@ describe('tests for toggleable blog details', () => {
     const div = container.querySelector('.blog-details')
     expect(div).not.toHaveStyle('display: none')
   })
-
-  // test('if the like button is clicked twice, the event handler is called twice', async () => {
-  //   const likesButton = screen.getByText('like')
-
-  //   await user.click(likesButton)
-  //   await user.click(likesButton)
-
-  //   expect(mockHandler.mock.calls).toHaveLength(2)
-  // })
 })
 
