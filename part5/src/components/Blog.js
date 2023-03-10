@@ -1,11 +1,20 @@
 import { useState } from 'react'
 import blogService from '../services/blogService'
 
-const Blog = ({ blog, setBlogs }) => {
+const Blog = ({ blog, setBlogs, user }) => {
   const [detailsVisible, setDetailsVisible] = useState(false)
 
   const showWhenVisible = { display: detailsVisible ? '' : 'none' }
   const hideWhenVisible = { display: detailsVisible ? 'none' : '' }
+
+  function userAndBlogIDMatch() {
+    if(!user.blogs.length) return false
+    if(user.blogs.find(blog.id) === undefined) return false
+
+    return true
+  }
+
+  const removeBtnVisible = { display: userAndBlogIDMatch() ? '' : 'none' }
 
   const blogStyle = {
     paddingTop: 10,
@@ -40,7 +49,7 @@ const Blog = ({ blog, setBlogs }) => {
       <div style={ showWhenVisible } className='blog-details'>
         {blog.url} <br />
 
-        likes {blog.likes}
+        likes <span id='numOfLikes'>{blog.likes}</span>
         <button type='button' className='like-btn' onClick={incrementLike}>like</button>
         <br />
 
@@ -51,13 +60,15 @@ const Blog = ({ blog, setBlogs }) => {
         onClick={ () => setDetailsVisible(true) }
         style={ hideWhenVisible }
         className='show-btn'
+        id='show-btn'
       >view</button>
       <button
         onClick={ () => setDetailsVisible(false) }
         style={ showWhenVisible }
         className='hide-btn'
+        id='hide-btn'
       >hide</button>
-      <button onClick={ deleteBlog } style={ showWhenVisible }>remove</button>
+      <button onClick={ deleteBlog } style={ removeBtnVisible }>remove</button>
     </div>
   )
 }

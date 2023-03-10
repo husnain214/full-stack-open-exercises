@@ -47,7 +47,7 @@ const BlogForm = ({ formVisible, setFormVisible, createBlog }) => {
         />
       </div>
 
-      <button type='submit' id='createNoteBtn'>create</button>
+      <button type='submit' id='createBlogBtn'>create</button>
       <button type='button' onClick={ () => setFormVisible(false) }>cancel</button>
     </form>
   )

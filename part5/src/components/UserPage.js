@@ -6,7 +6,7 @@ import Notification from './Notification'
 import Blog from './Blog'
 import BlogForm from './BlogForm'
 
-const UserPage = ({ setUser, username }) => {
+const UserPage = ({ setUser, user }) => {
   const [blogs, setBlogs] = useState([])
   const [message, setMessage] = useState('')
   const [formVisible, setFormVisible] = useState(false)
@@ -28,8 +28,8 @@ const UserPage = ({ setUser, username }) => {
   }
 
   const createBlog = async newBlog => {
-    await blogService.create(newBlog)
-    setBlogs(blogs.concat(newBlog))
+    const blog = await blogService.create(newBlog)
+    setBlogs(blogs.concat(blog))
 
     setMessage(`a new blog ${newBlog.title} by ${newBlog.author} has been added`)
     setTimeout(() => setMessage(''), 3000)
@@ -43,12 +43,12 @@ const UserPage = ({ setUser, username }) => {
 
         <Notification message = {message} />
 
-        {username} logged in
+        {user.name} logged in
 
         <button onClick={ handleLogout }>logout</button>
 
         <div style={ hideWhenVisible }>
-          <button onClick={ () => setFormVisible(true) }>new Note</button>
+          <button onClick={ () => setFormVisible(true) }>new Blog</button>
         </div>
 
         <BlogForm
@@ -67,6 +67,7 @@ const UserPage = ({ setUser, username }) => {
                 blog = {blog}
                 blogs = {blogs}
                 setBlogs = {setBlogs}
+                user= {user}
               />
             )
         }

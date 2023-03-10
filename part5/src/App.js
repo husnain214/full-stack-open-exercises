@@ -18,7 +18,7 @@ const App = () => {
     <>
       {user === null
         ? <LoginForm setUser = {setUser} />
-        : <UserPage setUser = {setUser} username = {user.name} />
+        : <UserPage setUser = {setUser} user = {user} />
       }
     </>
   )
