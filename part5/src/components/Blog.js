@@ -6,15 +6,11 @@ const Blog = ({ blog, setBlogs, user }) => {
 
   const showWhenVisible = { display: detailsVisible ? '' : 'none' }
   const hideWhenVisible = { display: detailsVisible ? 'none' : '' }
+  const removeBtnVisible = { display: userAndBlogIDMatch() ? '' : 'none' }
 
   function userAndBlogIDMatch() {
-    if(!user.blogs.length) return false
-    if(user.blogs.find(blog.id) === undefined) return false
-
-    return true
+    return blog.user.username === user.username
   }
-
-  const removeBtnVisible = { display: userAndBlogIDMatch() ? '' : 'none' }
 
   const blogStyle = {
     paddingTop: 10,

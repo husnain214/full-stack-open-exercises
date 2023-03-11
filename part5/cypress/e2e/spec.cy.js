@@ -1,14 +1,14 @@
 describe('Blog app', function() {
   beforeEach(function() {
-    cy.request('POST', 'http://localhost:3003/api/testing/reset')
+    cy.request('POST', `${Cypress.env('BACKEND')}/testing/reset`)
 
-    cy.request('POST', 'http://localhost:3003/api/users/', {
+    cy.createUser({
       name: 'Husnain',
       username: 'root',
       password: 'salainen'
     })
 
-    cy.visit('http://localhost:3000')
+    cy.visit('')
   })
 
   it('Login form is shown', function() {
@@ -33,12 +33,9 @@ describe('Blog app', function() {
 
   describe('When logged in', function() {
     beforeEach(function() {
-      cy.request('POST', 'http://localhost:3003/api/login/', {
+      cy.login({
         username: 'root',
         password: 'salainen'
-      }).then( ({ body }) => {
-        localStorage.setItem('loggedBlogappUser', JSON.stringify(body))
-        cy.visit('http://localhost:3000')
       })
     })
 
@@ -54,20 +51,13 @@ describe('Blog app', function() {
 
     describe('some blogs exist', function() {
       beforeEach(function() {
-        cy.request({
-          url: 'http://localhost:3003/api/blogs',
-          method: 'POST',
-          body: {
-            title: 'Show your work',
-            author: 'Austin Kleone',
-            url: 'https://www.amazon.com/Show-Your-Work-Austin-Kleon/dp/076117897X'
-          },
-          headers: {
-            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('loggedBlogappUser')).token}`
-          }
+        cy.createBlog({
+          title: 'Show your work',
+          author: 'Austin Kleone',
+          url: 'https://www.amazon.com/Show-Your-Work-Austin-Kleon/dp/076117897X'
         })
 
-        cy.visit('http://localhost:3000')
+        cy.visit('')
       })
 
       it('User can like a blog', function() {
@@ -84,10 +74,10 @@ describe('Blog app', function() {
         cy.should('not.contain', 'Show your work')
       })
 
-      it.only('Other users cannot see the remove button', async function() {
+      it('Other users cannot see the remove button', function() {
         cy.contains('logout').click()
 
-        cy.request('POST', 'http://localhost:3003/api/users/', {
+        cy.createUser({
           name: 'Hamza',
           username: 'shahid',
           password: 'shahid'
@@ -99,7 +89,27 @@ describe('Blog app', function() {
 
         cy.contains('Show your work').contains('view').click()
         cy.contains('Show your work').contains('button', 'remove').should('exist')
+      })
 
+      it('Blogs are sorted according to likes', function() {
+        cy.createBlog({
+          title: 'A Game of Thrones',
+          author: 'G.R.R Martin',
+          url: 'https://www.google.com/aclk?sa=l&ai=DChcSEwiiy5OpgNL9AhUDjWgJHd42CDUYABAAGgJ3Zg&sig=AOD64_0qNISyCF7OuPaYQKCDKRBvr1ApFg&q&adurl&ved=2ahUKEwiZgI2pgNL9AhV8UqQEHShsDsQQ0Qx6BAgNEAE'
+        })
+
+        cy.visit('')
+
+        cy.get('.blog').eq(0).should('contain', 'Show your work')
+        cy.get('.blog').eq(1).should('contain', 'A Game of Thrones')
+
+        cy.contains('A Game of Thrones').contains('view').click()
+        cy.contains('A Game of Thrones').contains('like').click()
+
+        cy.wait(1000)
+
+        cy.get('.blog').eq(1).should('contain', 'Show your work')
+        cy.get('.blog').eq(0).should('contain', 'A Game of Thrones')
       })
     })
   })

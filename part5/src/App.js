@@ -7,10 +7,10 @@ const App = () => {
   const [user, setUser] = useState(null)
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (loggedUserJSON) {
+    if(loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      blogService.setToken(user.token)
+      blogService.setConfig(user.token)
     }
   }, [])
 
