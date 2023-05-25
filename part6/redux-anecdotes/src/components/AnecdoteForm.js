@@ -1,17 +1,22 @@
 import { useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { createAnecdote } from '../reducers/anecdoteReducer'
+import { createNotify, removeNotification } from '../reducers/notificationReducer'
 
 const AnecdoteForm = () => {
   const [newAnecdote, setNewAnecdote] = useState('')
 
-  const anecdotes = useSelector(state => state)
   const dispatch = useDispatch()
 
   const handleOnSubmit = event => {
     event.preventDefault() 
     dispatch(createAnecdote(newAnecdote))
+    dispatch(createNotify(newAnecdote))
     setNewAnecdote('')
+
+    setTimeout(() => {
+      dispatch(removeNotification())
+    }, 5000);
   }
 
   return (
