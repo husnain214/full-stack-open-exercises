@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import blogService from '../services/blogService'
+import { removeBlog, likeBlog } from '../reducers/blogReducer'
+import { useDispatch } from 'react-redux'
 
-const Blog = ({ blog, setBlogs, user }) => {
+const Blog = ({ blog, user }) => {
+  const dispatch = useDispatch()
   const [detailsVisible, setDetailsVisible] = useState(false)
 
   const showWhenVisible = { display: detailsVisible ? '' : 'none' }
@@ -20,13 +22,8 @@ const Blog = ({ blog, setBlogs, user }) => {
     marginBottom: 5,
   }
 
-  const incrementLike = async () => {
-    blog = { ...blog, likes: blog.likes + 1 }
-
-    await blogService.update(blog.id, blog)
-    const blogList = await blogService.getAll()
-
-    setBlogs(blogList)
+  const incrementLike = async () => { 
+    dispatch(likeBlog(blog))
   }
 
   const deleteBlog = async () => {
@@ -35,9 +32,7 @@ const Blog = ({ blog, setBlogs, user }) => {
     )
     if (!deleteConfirm) return
 
-    await blogService.remove(blog.id)
-    const blogList = await blogService.getAll()
-    setBlogs(blogList)
+    dispatch(removeBlog(blog.id))
   }
 
   return (

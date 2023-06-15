@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
-import blogService from '../services/blogService'
 import Notification from './Notification'
 import Blog from './Blog'
 import BlogForm from './BlogForm'
 import { useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
+import { intializeBlogs, createBlog } from '../reducers/blogReducer'
+import { useSelector } from 'react-redux'
+import { logout } from '../reducers/userReducer'
 
-const UserPage = ({ setUser, user }) => {
-  const [blogs, setBlogs] = useState([])
+const UserPage = ({ user }) => {
+  const blogs = useSelector(state => state.blogs)
   const [formVisible, setFormVisible] = useState(false)
 
   const dispatch = useDispatch()
@@ -17,19 +19,15 @@ const UserPage = ({ setUser, user }) => {
   const hideWhenVisible = { display: formVisible ? 'none' : '' }
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => {
-      setBlogs(blogs)
-    })
+    dispatch(intializeBlogs())
   }, [])
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
+    dispatch(logout())
   }
 
-  const createBlog = async (newBlog) => {
-    const blog = await blogService.create(newBlog)
-    setBlogs(blogs.concat(blog))
+  const addBlog = async (newBlog) => {
+    dispatch(createBlog(newBlog))
 
     dispatch(setNotification(`a new blog ${newBlog.title} by ${newBlog.author} has been added`, 3000))
     setFormVisible(false)
@@ -47,18 +45,17 @@ const UserPage = ({ setUser, user }) => {
       <BlogForm
         formVisible={formVisible}
         setFormVisible={setFormVisible}
-        createBlog={createBlog}
+        createBlog={addBlog}
       />
       {blogs.length === 0
         ? '...'
-        : blogs
+        : [...blogs]
             .sort((first, second) => second.likes - first.likes)
             .map((blog) => (
               <Blog
                 key={blog.id}
                 blog={blog}
                 blogs={blogs}
-                setBlogs={setBlogs}
                 user={user}
               />
             ))}
