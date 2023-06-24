@@ -1,29 +1,39 @@
-import { useState } from 'react'
-import { removeBlog, likeBlog } from '../reducers/blogReducer'
+import { useEffect, useState } from 'react'
+import { removeBlog, likeBlog, createComment } from '../reducers/blogReducer'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
-const Blog = ({ blog, user }) => {
+const Blog = ({ blog }) => {
   const dispatch = useDispatch()
-  const [detailsVisible, setDetailsVisible] = useState(false)
+  const navigate = useNavigate()
 
-  const showWhenVisible = { display: detailsVisible ? '' : 'none' }
-  const hideWhenVisible = { display: detailsVisible ? 'none' : '' }
-  const removeBtnVisible = { display: userAndBlogIDMatch() ? '' : 'none' }
+  const [commentVisible, setCommentVisible] = useState(false)
+  const [comment, setComment] = useState('')
 
-  function userAndBlogIDMatch() {
-    return blog.user.username === user.username
-  }
+  const [isPageValid, setIsPageValid] = useState(false)
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
+  useEffect(() => {
+    if(!blog) {  
+      navigate('/')
+    }
 
-  const incrementLike = async () => { 
+    setIsPageValid(true)
+  }, [blog, navigate])
+
+  if (!isPageValid) return
+
+  const incrementLike = () => { 
     dispatch(likeBlog(blog))
+  }
+
+  const addComment = event => {
+    event.preventDefault()
+    const newBlog = { ...blog, comments: blog.comments.concat(comment) }
+
+    console.log('newBlog', newBlog)
+    dispatch(createComment(newBlog))
+
+    setComment('')
   }
 
   const deleteBlog = async () => {
@@ -36,36 +46,34 @@ const Blog = ({ blog, user }) => {
   }
 
   return (
-    <div style={blogStyle} className="blog">
-      {blog.title} {blog.author}
-      <div style={showWhenVisible} className="blog-details">
-        {blog.url} <br />
-        likes <span id="numOfLikes">{blog.likes}</span>
-        <button type="button" className="like-btn" onClick={incrementLike}>
-          like
-        </button>
-        <br />
-        {blog.author} <br />
-      </div>
-      <button
-        onClick={() => setDetailsVisible(true)}
-        style={hideWhenVisible}
-        className="show-btn"
-        id="show-btn"
-      >
-        view
-      </button>
-      <button
-        onClick={() => setDetailsVisible(false)}
-        style={showWhenVisible}
-        className="hide-btn"
-        id="hide-btn"
-      >
-        hide
-      </button>
-      <button onClick={deleteBlog} style={removeBtnVisible}>
-        remove
-      </button>
+    <div className="blog">
+      <h1>{blog.title}</h1>
+      <a href={blog.info}>{blog.info}</a>
+      <span>{blog.likes} likes</span>
+      <button onClick={incrementLike}>like</button>
+      <p>added by {blog.author}</p>
+
+      <button onClick={() => setCommentVisible(true)}>add a comment</button>
+
+      <form onSubmit={addComment} style={{
+        display: commentVisible ? '' : 'none'
+      }}>
+        <input 
+          type='text' 
+          placeholder='add comment' 
+          onChange = { ({ target }) => setComment(target.value) } 
+          value = {comment} />
+          <button>submit</button>
+          <button onClick={() => setCommentVisible(false)}>cancel</button>
+      </form>
+
+      <h2>comments</h2>
+
+      <ul>
+        {
+          blog.comments.map( (comment, index) => <li key={index}>{comment}</li> )
+        }
+      </ul>
     </div>
   )
 }
